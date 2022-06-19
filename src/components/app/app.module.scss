@@ -1,0 +1,52 @@
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    z-index: 0;
+    min-height: calc(100vh - 80px);
+    width: 1120px;
+    align-items: center;
+    margin: 0 auto;
+}
+
+.main {
+    display: flex;
+    position: relative;
+    background-color: rgba(0, 0, 0, 0.492);
+}
+
+.bgwrapper {
+    width: 100%;
+    position: absolute;
+    height: 100%;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.moviesNotFound {
+    z-index: 1;
+    font-size: 20px;
+    color: rgb(61, 61, 61);
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    width: fit-content;
+    margin: 30px auto 0;
+    line-height: 1.5;
+}
+
+.bg {
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 100%;
+    height: 100%;
+    filter: blur(50px);
+}
+
+.filtersWrapper {
+    z-index: 2;
+    position: absolute;
+    height: 100%;
+    padding-bottom: 120px;
+    margin: 40px 50px 0;
+}

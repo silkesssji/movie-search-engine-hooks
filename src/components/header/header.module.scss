@@ -1,0 +1,32 @@
+.header {
+    width: 100%;
+    height: fit-content;
+    padding: 30px 0;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.heading {
+    font-size: 60px;
+    margin: -8px auto 10px;
+    color: white;
+    text-shadow: rgb(0, 0, 0) 0 0 10px;
+    width: fit-content;
+}
+.input {
+    line-height: 1.5;
+    font-family: Arial, Helvetica, sans-serif;
+    width: 500px;
+    height: 40px;
+    font-size: 20px;
+    outline: none;
+    border: none;
+    margin: 0 auto;
+    border-radius: 5px;
+    display: block;
+    padding: 0px 16px;
+    box-shadow: rgb(0 0 0) 0 0 10px;
+    &::placeholder {
+        font-family: Arial, Helvetica, sans-serif;
+    }
+}

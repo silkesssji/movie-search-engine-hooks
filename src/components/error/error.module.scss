@@ -1,0 +1,35 @@
+.refreshButton {
+    margin: 5px auto;
+    background-color: rgb(25, 155, 255);
+    z-index: 1;
+    width: fit-content;
+    color: white;
+    border: none;
+    padding: 8px;
+    font-size: 20px;
+    border-radius: 5px;
+
+    &:hover {
+        background-color: rgb(13, 108, 181);
+        transition: background-color 0.3s;
+    }
+
+    &:active {
+        background-color: rgb(9, 53, 86);
+    }
+}
+
+.errorMessage {
+    z-index: 1;
+    font-size: 20px;
+    color: rgb(61, 61, 61);
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    width: 300px;
+    margin: 30px auto;
+    text-align: center;
+    line-height: 1.5;
+    display: flex;
+    flex-direction: column;
+}

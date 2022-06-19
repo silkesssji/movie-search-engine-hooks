@@ -1,0 +1,32 @@
+.container {
+    z-index: 2;
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    width: 250px;
+    margin: 45px 0 0;
+    position: sticky;
+    // left: 50%;
+    // transform: translate(0%, 50%);
+    display: flex;
+    flex-direction: column;
+    font-size: 20px;
+    top: 80px;
+    left: 50%;
+    bottom: 50%;
+    max-height: 445px;
+    overflow-y:scroll;
+    box-shadow: rgb(0 0 0) 0 0 10px;
+    &::-webkit-scrollbar {
+        -webkit-appearance: none;
+        width: 7px;
+      }
+    &::-webkit-scrollbar-thumb {
+        border-radius: 4px;
+        background-color: rgba(0, 0, 0, .5);
+      }
+}
+.heading {
+    margin: 5px auto;
+    font-size: 20px;
+}

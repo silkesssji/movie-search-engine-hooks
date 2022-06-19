@@ -1,0 +1,55 @@
+$skeletonBG: linear-gradient(90deg, rgba(165,165,165,0.6702031154258579) 0%, rgba(230,230,230,1) 50%, rgba(165,165,165,1) 100%);
+
+.cardWrapper {
+    display: flex;
+    margin: -15px auto;
+    flex-wrap: wrap;
+    z-index: 1;
+    justify-content: space-around;
+}
+.cardContainer {
+    background-image: none;
+    width: 250px;
+    height: 450px;
+    margin: 18px 15px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.297);
+}
+.card {
+    height: 370px;
+    background: $skeletonBG;
+    margin: 0 auto;
+    background-size: cover;
+    background-position: center;
+    border-radius: 5px 5px 0 0;
+    position: relative;
+    margin: 10px 10px 0 10px;
+    background-size: 200% 200%;
+    animation: skeletonBG 1s ease infinite;
+}
+.cardHeading {
+    display: flex;
+    margin: 0 auto;
+    height: 40px;
+    padding: 10px 0;
+    flex-direction: column;
+    position: relative;
+    background: $skeletonBG;
+    background-size: 200% 200%;
+    animation: skeletonBG 1s ease infinite;
+    border-radius: 5px;
+    margin: 15px 10px;
+}
+
+@keyframes skeletonBG {
+    0% {
+        background-position: 0 0%;
+    }
+    50% {
+        background-position: 100% 100%;
+    }
+    100% {
+        background-position: 0 0%;
+    }
+}

@@ -1,0 +1,61 @@
+.pagination {
+    height: fit-content;
+    border-radius: 5px;
+    margin: 20px auto;
+    background: none;
+    display: flex;
+    align-items: center;
+    z-index: 2;
+    min-height: 40px;
+}
+.button {
+    height: fit-content;
+    text-transform: uppercase;
+    color: rgb(47, 47, 47);
+    background-color: rgb(255, 255, 255);
+    border: none;
+    margin: auto auto;
+    border-radius: 5px;
+    align-self: center;
+    line-height: 1.5;
+    margin: 0 5px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 20px;
+    cursor: pointer;
+    &:active {
+        background-color: rgba(219, 219, 219, 0.779);
+    }
+}
+.current {
+    min-width: fit-content;
+    min-height: fit-content;
+    height: fit-content;
+    text-transform: uppercase;
+    color: rgb(47, 47, 47);
+    background-color: rgb(255, 255, 255);
+    border: none;
+    margin: auto auto;
+    border-radius: 5px;
+    align-self: center;
+    line-height: 1.5;
+    margin: 0 5px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 20px;
+    text-align: center;
+    cursor: default;
+    background-color: rgb(60, 60, 60);
+    color: rgb(226, 226, 226);
+}
+.disabled {
+    color: rgb(184, 184, 184);
+    cursor: default;
+    &:active {
+        background-color: rgb(255, 255, 255);
+    }
+}
+.dots {
+    color: rgb(226, 226, 226);
+    display: block;
+    font-size: 35px;
+    height: fit-content;
+}
