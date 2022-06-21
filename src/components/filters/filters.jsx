@@ -1,14 +1,13 @@
-import React from 'react';
 import styles from './filters.module.scss';
 import { Checkbox } from '../checkbox/checkbox';
 
-export const Filters = ({
+export function Filters({
     adult,
     onChange,
     existingGenres,
     choosedGenres,
     allChecked,
-}) => {
+}) {
     return (
         <div className={styles.container}>
             <h2 className={styles.heading}>

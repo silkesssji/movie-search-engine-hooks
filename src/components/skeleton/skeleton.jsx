@@ -1,10 +1,9 @@
-import React from 'react';
 import { range } from '../../lib/range';
 import styles from './skeleton.module.scss'
 
 const skeletonArray = range(0, 20);
 
-export const Skeleton = () => {
+export function Skeleton() {
     return (
         <div className={styles.cardWrapper}>
             {skeletonArray.map((index) => {

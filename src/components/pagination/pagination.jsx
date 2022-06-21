@@ -1,13 +1,12 @@
-import React from 'react';
 import styles from "./pagination.module.scss";
 import cn from 'classnames';
 import { generatePagination } from '../../lib/generatePagintaion';
 
-export const Pagination = ({
+export function Pagination({
     totalPages,
     page,
     changePage,
-}) => {
+}) {
     if (totalPages === 0) {
         return null;
     }

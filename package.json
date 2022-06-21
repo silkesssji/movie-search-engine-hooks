@@ -1,10 +1,10 @@
 {
-  "name": "movie-search",
+  "name": "movie-search-hooks",
   "version": "0.1.0",
   "main": "index.html",
   "private": true,
   "author": "kastris",
-  "homepage": "https://silkesssji.github.io/movie-search-engine/",
+  "homepage": "https://silkesssji.github.io/movie-search-engine-hooks/",
   "license": "ISC",
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.4",
@@ -14,8 +14,7 @@
     "gh-pages": "^3.2.3",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "react-scripts": "5.0.1",
-    "sass": "^1.50.1",
+    "react-scripts": "^5.0.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -37,5 +36,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "sass": "^1.52.3"
   }
 }

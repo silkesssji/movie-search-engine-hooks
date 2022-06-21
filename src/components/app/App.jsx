@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 import styles from "./app.module.scss";
 import { Pagination } from '../pagination/pagination';
@@ -12,184 +12,58 @@ import { api } from '../../lib/api';
 import { getRandomInteger } from '../../lib/getRandomInteger';
 import { Error } from '../error/error';
 
-export class App extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            movies: [],
-            page: 1,
-            mounting: true,
-            backgroundPath: '',
-            totalPages: 1,
-            errors: {
-                moviesFail: null,
-                genresFail: null
-            },
-            loading: true,
-            choosedGenres: [],
-            requestValue: '',
-            adult: false,
-        }
+
+export function App({ initialQueryParams }) {
+    const [movies, setMovies] = useState([]);
+    const [page, setPage] = useState(1);
+    const [backgroundPath, setBackdropPath] = useState('');
+    const [totalPages, setTotalPages] = useState(1);
+    const [errors, setErrors] = useState({
+        moviesFail: null,
+        genresFail: null
     }
+    );
+    const [loading, setLoading] = useState(true);
+    const [choosedGenres, setChoosedGenres] = useState([]);
+    const [requestValue, setRequestValue] = useState('');
+    const [adult, setAdult] = useState(false);
+    const [genres, setGenres] = useState([]);
+    const [mounting, setMounting] = useState(true);
+    const abort = useRef(null);
 
-    fetchMovies = async () => {
-        this.setState({ loading: true });
-
-        if (this.abort) {
-            this.abort.abort();
-        }
-
-        this.abort = new AbortController();
-        try {
-            const fetchedMovies = this.state.requestValue
-                ? await api.search(
-                    this.state.requestValue,
-                    this.state.page,
-                    this.state.adult,
-                    this.abort.signal
-                )
-                : await api.trends(
-                    'day',
-                    this.state.page,
-                    this.abort.signal
-                );
-            this.setState({
-                totalPages: fetchedMovies.total_pages,
-                movies: fetchedMovies.results,
-                loading: false
-            });
-            this.state.errors.moviesFail = null;
-        } catch (e) {
-            this.state.errors.moviesFail = e.message;
-            this.setState({ loading: false })
-        }
-        this.abort = null;
-    }
-
-    handlePageChange = (page) => {
-        this.setState({ page });
-    }
-
-    handleRequestChange = debounce((e) => {
-        if (e.target.value.replace(/\s/g, '')) {
-            this.setState({
-                page: 1,
-                requestValue: e.target.value,
-            });
-        } else {
-            this.setState({ requestValue: '' });
-        }
-    }, 300)
-
-    areAllGenresChecked = (allGenres, choosedGenres) => {
-        return allGenres.every((genre) => choosedGenres.includes(genre))
-    }
-
-    updateHistoryQueryParams = ({ page, adult, requestValue }) => {
-        if (history.pushState) {
-            const paramsObj = new URLSearchParams({
-                page,
-                adult,
-            });
-            if (this.state.requestValue !== '') {
-                paramsObj.append('request', requestValue);
+    useEffect(() => {
+        async function mounting() {
+            const fetchedGenres = await fetchGenreNames();
+            setGenres(fetchedGenres);
+            setChoosedGenres(fetchedGenres);
+            const { queryAdult, queryPage, queryRequestValue } = getQueryParams(initialQueryParams);
+            if (queryAdult === 'true') {
+                setAdult(true);
             }
-            window.history.pushState('', '', `?${paramsObj}`);
+            if (queryPage) {
+                setPage(Number(queryPage));
+            }
+            if (queryRequestValue) {
+                setRequestValue(queryRequestValue);
+            }
+            setBackdropPath(await fetchRandomBackgroundUrl('day'));
         }
-    }
+        mounting();
+        setMounting(false)
+    }, [])
 
-    componentDidUpdate(_, prevState) {
-        const { page, requestValue, adult, mounting } = this.state;
-        if ((page !== prevState.page
-            || requestValue !== prevState.requestValue
-            || adult !== prevState.adult) && this.state.mounting === false
-        ) {
-            this.updateHistoryQueryParams({ page, requestValue, adult })
+    useEffect(() => {
+        setLoading(true);
+        if (mounting === false) {
+            updateHistoryQueryParams(page, requestValue, adult);
             if ((requestValue !== undefined)) {
-                this.fetchMovies();
+                fetchMovies();
             }
         }
-        if (this.state.errors.moviesFail && this.state.genresFail) {
-            this.setState({
-                mounting: false,
-                loading: false
-            })
-        }
-    }
 
-    chooseAllGenresOption = () => {
-        const allGenresChecked = this.areAllGenresChecked(this.state.genres, this.state.choosedGenres);
-        if (allGenresChecked) {
-            this.setState({ choosedGenres: [] })
-        } else {
-            this.setState({ choosedGenres: this.state.genres })
-        }
-    }
+    }, [page, requestValue, adult])
 
-    handleCheckboxChange = (e) => {
-        const checkboxValue = e.target.value;
-        if (checkboxValue === "adult") {
-            this.setState({ adult: !this.state.adult });
-        } else if (checkboxValue === "all") {
-            this.chooseAllGenresOption();
-        } else {
-            if (this.state.choosedGenres.includes(checkboxValue)) {
-                this.setState({ choosedGenres: this.state.choosedGenres.filter((genre) => genre !== checkboxValue) });
-            } else {
-                this.setState({ choosedGenres: [...this.state.choosedGenres, checkboxValue] });
-            }
-        }
-        this.setState({ page: 1 })
-    }
-
-    fetchGenreNames = async () => {
-        try {
-            const json = await api.getGenres();
-            const genres = json.genres;
-            const genresNames = genres.map((genre) => genre.name);
-            this.state.errors.genresFail = null;
-            return genresNames;
-        } catch (e) {
-            this.state.errors.genresFail = e.message;
-            this.setState({
-                loading: false,
-            })
-        }
-    }
-
-    componentDidMount = async () => {
-        this.setState({
-            genres: await this.fetchGenreNames(),
-            choosedGenres: await this.fetchGenreNames()
-        });
-
-        const { queryAdult, queryPage, queryRequestValue } = this.getQueryParams(this.props.initialQueryParams);
-
-        if (queryAdult === 'true') {
-            this.setState({ adult: true });
-        }
-        if (queryPage) {
-            this.setState({ page: Number(queryPage) });
-        }
-        if (queryRequestValue) {
-            this.setState({ requestValue: queryRequestValue });
-        }
-        this.setState({ backgroundPath: await this.fetchRandomBackgroundUrl('day') })
-        await this.fetchMovies();
-        this.setState({
-            mounting: false,
-            loading: false
-        });
-    }
-
-    getQueryParams = (queryParams) => {
-        const queryAdult = queryParams.get('adult');
-        const queryPage = queryParams.get('page');
-        const queryRequestValue = queryParams.get('request');
-        return { queryAdult, queryPage, queryRequestValue }
-    }
-
-    fetchRandomBackgroundUrl = async (timeType) => {
+    const fetchRandomBackgroundUrl = async (timeType) => {
         try {
             const backgroundFetch = await api.trends(timeType, 1);
             const backgroundPath = backgroundFetch.results[getRandomInteger(0, 19)].backdrop_path;
@@ -199,79 +73,182 @@ export class App extends React.Component {
         }
     }
 
-    render() {
-        const haveMovies = this.state.movies.length;
-        return (
-            <>
-                <Header
-                    backgroundPath={this.state.backgroundPath}
-                    changeRequest={this.handleRequestChange}
-                />
-                <main className={styles.main}>
-                    <div className={styles.filtersWrapper}>
-                        {this.state.genres && this.state.errors.genresFail === null &&
-                            <Filters
-                                adult={this.state.adult}
-                                onChange={this.handleCheckboxChange}
-                                existingGenres={this.state.genres}
-                                choosedGenres={this.state.choosedGenres}
-                                allChecked={this.areAllGenresChecked(this.state.genres, this.state.choosedGenres)}
-                            />
-                        }
-                        {this.state.errors.genresFail !== null && !this.state.loading && (
-                            <Error
-                                message={'Filters error'}
-                                onClick={() => window.location.reload()}
-                            />
-                        )}
-                    </div>
-                    <div className={styles.wrapper}>
-                        {this.state.errors.moviesFail === null && (
-                            <Pagination
-                                totalPages={this.state.totalPages}
-                                page={this.state.page}
-                                changePage={this.handlePageChange}
-                            />
-                        )}
-
-                        {this.state.loading && this.state.errors.moviesFail === null && <Skeleton />}
-
-                        {Boolean(haveMovies) && !this.state.loading && this.state.errors.moviesFail === null && (
-                            <Movies movies={this.state.movies} />
-                        )}
-
-                        {this.state.errors.moviesFail !== null && !this.state.loading && (
-                            <Error
-                                message={this.state.errors.moviesFail}
-                                onClick={this.fetchMovies}
-                            />
-                        )}
-
-                        {this.state.loading === false && !haveMovies && this.state.errors.moviesFail === null && (
-                            <div className={styles.moviesNotFound}>Ничего не найдено</div>
-                        )}
-
-                        {this.state.errors.moviesFail === null && (
-                            <Pagination
-                                totalPages={this.state.totalPages}
-                                page={this.state.page}
-                                changePage={this.handlePageChange}
-                            />
-                        )}
-                    </div>
-                    <div className={styles.bgwrapper}>
-                        <div
-                            className={styles.bg}
-                            style={{
-                                background: this.state.backgroundPath.length
-                                    ? `url(https://image.tmdb.org/t/p/original/${this.state.backgroundPath}`
-                                    : 'grey'
-                            }}
-                        />
-                    </div>
-                </main>
-                <Footer />
-            </>
-        )
+    const getQueryParams = (queryParams) => {
+        const queryAdult = queryParams.get('adult');
+        const queryPage = queryParams.get('page');
+        const queryRequestValue = queryParams.get('request');
+        return { queryAdult, queryPage, queryRequestValue }
     }
+
+    const updateHistoryQueryParams = (page, requestValue, adult) => {
+        if (history.pushState) {
+            const paramsObj = new URLSearchParams({
+                page,
+                adult,
+            });
+            if (requestValue !== '') {
+                paramsObj.append('request', requestValue);
+            }
+            window.history.pushState('', '', `?${paramsObj}`);
+        }
+    }
+
+    const fetchGenreNames = async () => {
+        try {
+            const json = await api.getGenres();
+            const fetchedGenres = json.genres;
+            const genresNames = fetchedGenres.map((genre) => genre.name);
+            errors.genresFail = null
+            return genresNames;
+        } catch (e) {
+            errors.genresFail = e.message;
+        }
+    }
+
+    const fetchMovies = async () => {
+        if (abort.current) {
+            abort.current.abort();
+        }
+        abort.current = new AbortController();
+        try {
+            const fetchedMovies = requestValue
+                ? await api.search(
+                    requestValue,
+                    page,
+                    adult,
+                    abort.current.signal
+                )
+                : await api.trends(
+                    'day',
+                    page,
+                    abort.current.signal
+                );
+            setTotalPages(fetchedMovies.total_pages);
+            setMovies(fetchedMovies.results);
+            errors.moviesFail = null;
+        } catch (e) {
+            errors.moviesFail = e.message;
+        }
+        abort.current = null;
+        setLoading(false);
+    }
+
+    const handleRequestChange = debounce((e) => {
+        if (e.target.value.replace(/\s/g, '')) {
+            setPage(1);
+            setRequestValue(e.target.value);
+        } else {
+            setRequestValue('');
+        }
+    }, 300)
+
+    const handlePageChange = (page) => {
+        setPage(page);
+    }
+
+    const handleCheckboxChange = (e) => {
+        const checkboxValue = e.target.value;
+        if (checkboxValue === "adult") {
+            setAdult(!adult);
+        } else if (checkboxValue === "all") {
+            chooseAllGenresOption();
+        } else {
+            if (choosedGenres.includes(checkboxValue)) {
+                setChoosedGenres(choosedGenres.filter((genre) => genre !== checkboxValue));
+            } else {
+                setChoosedGenres([...choosedGenres, checkboxValue]);
+            }
+        }
+        setPage(1);
+    }
+
+    const chooseAllGenresOption = () => {
+        const allGenresChecked = areAllGenresChecked(genres, choosedGenres);
+        if (allGenresChecked) {
+            setChoosedGenres([]);
+        } else {
+            setChoosedGenres(genres)
+        }
+    }
+
+    const defineContent = () => {
+        if (loading) {
+            return <Skeleton />
+        }
+        if (movies.length) {
+            return <Movies movies={movies} />
+        }
+        if (!errors.moviesFail) {
+            return <div className={styles.moviesNotFound}>Ничего не найдено</div>
+        }
+    }
+
+    const areAllGenresChecked = (allGenres, choosedGenres) => {
+        return allGenres.every((genre) => choosedGenres.includes(genre))
+    }
+
+    return (
+        <>
+            <Header
+                backgroundPath={backgroundPath}
+                changeRequest={handleRequestChange}
+            />
+            <main className={styles.main}>
+                <div className={styles.filtersWrapper}>
+                    {genres && errors.genresFail === null &&
+                        <Filters
+                            adult={adult}
+                            onChange={handleCheckboxChange}
+                            existingGenres={genres}
+                            choosedGenres={choosedGenres}
+                            allChecked={areAllGenresChecked(genres, choosedGenres)}
+                        />
+                    }
+                    {errors.genresFail !== null && !loading && (
+                        <Error
+                            message={'Filters error'}
+                            onClick={() => window.location.reload()}
+                        />
+                    )}
+                </div>
+                <div className={styles.wrapper}>
+                    {errors.moviesFail === null && (
+                        <Pagination
+                            totalPages={totalPages}
+                            page={page}
+                            changePage={handlePageChange}
+                        />
+                    )}
+
+                    {errors.moviesFail !== null && !loading && (
+                        <Error
+                            message={errors.moviesFail}
+                            onClick={fetchMovies}
+                        />
+                    )}
+
+                    {defineContent()}
+
+                    {errors.moviesFail === null && (
+                        <Pagination
+                            totalPages={totalPages}
+                            page={page}
+                            changePage={handlePageChange}
+                        />
+                    )}
+                </div>
+                <div className={styles.bgwrapper}>
+                    <div
+                        className={styles.bg}
+                        style={{
+                            background: backgroundPath.length
+                                ? `url(https://image.tmdb.org/t/p/original/${backgroundPath}`
+                                : 'grey'
+                        }}
+                    />
+                </div>
+            </main>
+            <Footer />
+        </>
+    )
 }

@@ -1,10 +1,9 @@
-import React from 'react';
 import styles from './card.module.scss'
 
-export const Card = ({
+export function Card({
     imageUrl,
     title,
-}) => {
+}) {
     return (
         <div className={styles.cardContainer}>
             <div className={styles.card}>

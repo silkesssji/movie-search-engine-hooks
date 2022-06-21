@@ -1,10 +1,9 @@
-import React from 'react';
 import styles from './movies.module.scss'
 import { Card } from '../card/card';
 
-export const Movies = ({
+export function Movies({
     movies
-}) => {
+}) {
     return (
         <div className={styles.cardWrapper}>
             {movies.length !== 0 && movies

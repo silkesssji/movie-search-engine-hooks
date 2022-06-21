@@ -1,14 +1,13 @@
-import React from 'react';
 import cn from 'classnames';
 import styles from "./checkbox.module.scss";
 
-export const Checkbox = ({
+export function Checkbox({
     id,
     label,
     checked,
     value,
     onChange
-}) => {
+}) {
     return (
         <label
             className={cn(styles.checkbox, {

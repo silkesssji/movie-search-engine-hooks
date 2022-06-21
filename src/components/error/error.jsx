@@ -1,9 +1,8 @@
-import React from "react";
 import styles from './error.module.scss'
 
-export const Error = ({
+export function Error({
     message, onClick
-}) => {
+}) {
     return (
         <div className={styles.errorMessage}>
             {message}

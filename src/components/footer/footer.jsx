@@ -1,8 +1,7 @@
-import React from 'react';
 import styles from "./footer.module.scss";
 import logo from '../../img/logo.svg';
 
-export const Footer = () => {
+export function Footer() {
     return (
         <footer className={styles.footer}>
             <div className={styles.wrapper}>
