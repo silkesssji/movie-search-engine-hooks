@@ -1,8 +1,8 @@
 # Movie Search Engine
 
-This is a search engine built with ReactJS and a [TMDB](https://developers.themoviedb.org/) database for front-end practice.
+[Movie search project rewritten on hooks](https://github.com/silkesssji/movie-search-engine/)
 
-![](https://github.com/silkesssji/movie-search-engine/blob/main/src/img/preview.png)
+"This is a search engine built with ReactJS and a [TMDB](https://developers.themoviedb.org/) database for front-end practice."
 
 ## Demo
 
