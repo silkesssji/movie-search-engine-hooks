@@ -32,36 +32,27 @@ export function App({ initialQueryParams }) {
     const abort = useRef(null);
 
     useEffect(() => {
-        async function mounting() {
-            const fetchedGenres = await fetchGenreNames();
-            setGenres(fetchedGenres);
-            setChoosedGenres(fetchedGenres);
-            const { queryAdult, queryPage, queryRequestValue } = getQueryParams(initialQueryParams);
-            if (queryAdult === 'true') {
-                setAdult(true);
-            }
-            if (queryPage) {
-                setPage(Number(queryPage));
-            }
-            if (queryRequestValue) {
-                setRequestValue(queryRequestValue);
-            }
-            setBackdropPath(await fetchRandomBackgroundUrl('day'));
-        }
-        mounting();
-        setMounting(false)
+        mountingInitialConditions();
     }, [])
 
     useEffect(() => {
         setLoading(true);
-        if (mounting === false) {
+        if (!mounting) {
             updateHistoryQueryParams(page, requestValue, adult);
             if ((requestValue !== undefined)) {
                 fetchMovies();
             }
         }
-
+        setMounting(false);
     }, [page, requestValue, adult])
+
+    const mountingInitialConditions = async () => {
+        const fetchedGenres = await fetchGenreNames();
+        setGenres(fetchedGenres);
+        setChoosedGenres(fetchedGenres);
+        settingQueryParameters();
+        setBackdropPath(await fetchRandomBackgroundUrl('day'));
+    }
 
     const fetchRandomBackgroundUrl = async (timeType) => {
         try {
@@ -70,6 +61,19 @@ export function App({ initialQueryParams }) {
             return backgroundPath;
         } catch {
             return ''
+        }
+    }
+
+    const settingQueryParameters = () => {
+        const { queryAdult, queryPage, queryRequestValue } = getQueryParams(initialQueryParams);
+        if (queryAdult === 'true') {
+            setAdult(true);
+        }
+        if (queryPage) {
+            setPage(Number(queryPage));
+        }
+        if (queryRequestValue) {
+            setRequestValue(queryRequestValue);
         }
     }
 
@@ -171,7 +175,7 @@ export function App({ initialQueryParams }) {
         }
     }
 
-    const defineContent = () => {
+    const defineMoviesContent = () => {
         if (loading) {
             return <Skeleton />
         }
@@ -179,7 +183,9 @@ export function App({ initialQueryParams }) {
             return <Movies movies={movies} />
         }
         if (!errors.moviesFail) {
-            return <div className={styles.moviesNotFound}>Ничего не найдено</div>
+            return <div className={styles.moviesNotFound}>
+                Ничего не найдено
+            </div>
         }
     }
 
@@ -227,7 +233,7 @@ export function App({ initialQueryParams }) {
                         />
                     )}
 
-                    {defineContent()}
+                    {defineMoviesContent()}
 
                     {errors.moviesFail === null && (
                         <Pagination
