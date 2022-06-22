@@ -21,14 +21,12 @@ export function App({ initialQueryParams }) {
     const [errors, setErrors] = useState({
         moviesFail: null,
         genresFail: null
-    }
-    );
+    });
     const [loading, setLoading] = useState(true);
     const [choosedGenres, setChoosedGenres] = useState([]);
     const [requestValue, setRequestValue] = useState('');
     const [adult, setAdult] = useState(false);
     const [genres, setGenres] = useState([]);
-    const [mounting, setMounting] = useState(true);
     const abort = useRef(null);
 
     useEffect(() => {
@@ -37,13 +35,8 @@ export function App({ initialQueryParams }) {
 
     useEffect(() => {
         setLoading(true);
-        if (!mounting) {
-            updateHistoryQueryParams(page, requestValue, adult);
-            if ((requestValue !== undefined)) {
-                fetchMovies();
-            }
-        }
-        setMounting(false);
+        updateHistoryQueryParams(page, requestValue, adult);
+        fetchMovies();
     }, [page, requestValue, adult])
 
     const mountingInitialConditions = async () => {

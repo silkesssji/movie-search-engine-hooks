@@ -1,6 +1,6 @@
 # Movie Search Engine
 
-[Movie search project](https://github.com/silkesssji/movie-search-engine/) rewritten on hooks
+[Movie search project](https://github.com/silkesssji/movie-search-engine/) rewritten on hooks.
 
 "This is a search engine built with ReactJS and a [TMDB](https://developers.themoviedb.org/) database for front-end practice."
 
