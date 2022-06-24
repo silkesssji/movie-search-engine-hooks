@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from "react-router-dom";
+
 
 import styles from "./app.module.scss";
 import { Pagination } from '../pagination/pagination';
@@ -12,10 +14,21 @@ import { api } from '../../lib/api';
 import { getRandomInteger } from '../../lib/getRandomInteger';
 import { Error } from '../error/error';
 
+const getQueryParams = (queryParams) => {
+    const queryAdult = queryParams.get('adult');
+    const queryPage = queryParams.get('page');
+    const queryRequestValue = queryParams.get('request');
+    return { queryAdult, queryPage, queryRequestValue }
+}
 
-export function App({ initialQueryParams }) {
+export function App({ }) {
+    const [searchParams, setSearchParams] = useSearchParams();
+    const { queryAdult, queryPage, queryRequestValue } = getQueryParams(searchParams);
+
     const [movies, setMovies] = useState([]);
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useState(
+        queryPage ? Number(queryPage) : 1
+    );
     const [backgroundPath, setBackdropPath] = useState('');
     const [totalPages, setTotalPages] = useState(1);
     const [errors, setErrors] = useState({
@@ -24,26 +37,34 @@ export function App({ initialQueryParams }) {
     });
     const [loading, setLoading] = useState(true);
     const [choosedGenres, setChoosedGenres] = useState([]);
-    const [requestValue, setRequestValue] = useState('');
-    const [adult, setAdult] = useState(false);
+    const [requestValue, setRequestValue] = useState(
+        Boolean(queryRequestValue) ? queryRequestValue : ''
+    );
+    const [adult, setAdult] = useState(
+        queryAdult === 'true' ? true : false
+    );
+    const firstRender = useRef(true);
     const [genres, setGenres] = useState([]);
     const abort = useRef(null);
 
     useEffect(() => {
         mountingInitialConditions();
+        fetchMovies();
     }, [])
 
     useEffect(() => {
         setLoading(true);
         updateHistoryQueryParams(page, requestValue, adult);
-        fetchMovies();
+        if (!firstRender.current) {
+            fetchMovies();
+        }
+        firstRender.current = false;
     }, [page, requestValue, adult])
 
     const mountingInitialConditions = async () => {
         const fetchedGenres = await fetchGenreNames();
         setGenres(fetchedGenres);
         setChoosedGenres(fetchedGenres);
-        settingQueryParameters();
         setBackdropPath(await fetchRandomBackgroundUrl('day'));
     }
 
@@ -55,26 +76,6 @@ export function App({ initialQueryParams }) {
         } catch {
             return ''
         }
-    }
-
-    const settingQueryParameters = () => {
-        const { queryAdult, queryPage, queryRequestValue } = getQueryParams(initialQueryParams);
-        if (queryAdult === 'true') {
-            setAdult(true);
-        }
-        if (queryPage) {
-            setPage(Number(queryPage));
-        }
-        if (queryRequestValue) {
-            setRequestValue(queryRequestValue);
-        }
-    }
-
-    const getQueryParams = (queryParams) => {
-        const queryAdult = queryParams.get('adult');
-        const queryPage = queryParams.get('page');
-        const queryRequestValue = queryParams.get('request');
-        return { queryAdult, queryPage, queryRequestValue }
     }
 
     const updateHistoryQueryParams = (page, requestValue, adult) => {
@@ -124,7 +125,9 @@ export function App({ initialQueryParams }) {
             setMovies(fetchedMovies.results);
             errors.moviesFail = null;
         } catch (e) {
-            errors.moviesFail = e.message;
+            if (e.message !== 'The user aborted a request.') {
+                errors.moviesFail = e.message;
+            }
         }
         abort.current = null;
         setLoading(false);

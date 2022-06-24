@@ -1,7 +1,7 @@
 import { range } from '../../lib/range';
 import styles from './skeleton.module.scss'
 
-const skeletonArray = range(0, 20);
+const skeletonArray = range(0, 19);
 
 export function Skeleton() {
     return (
