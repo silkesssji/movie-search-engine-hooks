@@ -20,5 +20,15 @@ export const api = {
             signal
         });
         return response.json();
+    },
+
+    async getMovieInformation(id) {
+        const response = await fetch(`${this._path}/movie/${id}?api_key=${apiKey}&language=en-US`);
+        return response.json()
+    },
+
+    async getSimilarMovies(id) {
+        const response = await fetch(`${this._path}/movie/${id}/similar?api_key=${apiKey}&language=en-US&page=1`, { mode: 'cors' });
+        return response.json()
     }
 }

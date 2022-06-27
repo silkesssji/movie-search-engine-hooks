@@ -8,6 +8,13 @@
     margin: 0 auto;
 }
 
+.cardWrapper {
+    display: flex;
+    margin: -15px auto;
+    flex-wrap: wrap;
+    z-index: 1;
+}
+
 .main {
     display: flex;
     position: relative;

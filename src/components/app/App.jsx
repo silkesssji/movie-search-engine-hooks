@@ -79,16 +79,14 @@ export function App({ }) {
     }
 
     const updateHistoryQueryParams = (page, requestValue, adult) => {
-        if (history.pushState) {
-            const paramsObj = new URLSearchParams({
-                page,
-                adult,
-            });
-            if (requestValue !== '') {
-                paramsObj.append('request', requestValue);
-            }
-            window.history.pushState('', '', `?${paramsObj}`);
+        const paramsObj = new URLSearchParams({
+            page,
+            adult,
+        });
+        if (requestValue !== '') {
+            paramsObj.append('request', requestValue);
         }
+        setSearchParams(paramsObj)
     }
 
     const fetchGenreNames = async () => {
@@ -176,7 +174,9 @@ export function App({ }) {
             return <Skeleton />
         }
         if (movies.length) {
-            return <Movies movies={movies} />
+            return <div className={styles.cardWrapper}>
+                <Movies movies={movies} />
+            </div>
         }
         if (!errors.moviesFail) {
             return <div className={styles.moviesNotFound}>
@@ -194,6 +194,7 @@ export function App({ }) {
             <Header
                 backgroundPath={backgroundPath}
                 changeRequest={handleRequestChange}
+                value={requestValue}
             />
             <main className={styles.main}>
                 <div className={styles.filtersWrapper}>
