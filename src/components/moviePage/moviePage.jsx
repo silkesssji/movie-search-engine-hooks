@@ -12,7 +12,9 @@ export const MoviePage = ({ }) => {
     const loading = useRef(true);
     const [poster, setPoster] = useState('')
     const [similarMovies, setSimilarMovies] = useState([])
-
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+    }, [id])
     useEffect(() => {
         const setMovieInfo = async () => {
             const result = await api.getMovieInformation(id);
@@ -26,7 +28,6 @@ export const MoviePage = ({ }) => {
         }
         defineSimilarMovies();
     })
-
     useEffect(() => {
         if (movie.poster_path && movie.poster_path.length) {
             setPoster(movie.poster_path);
@@ -76,13 +77,12 @@ export const MoviePage = ({ }) => {
                                     `{movie.tagline}`
                                 </p>
                             }
-
                             <div className={styles.moreInfo}>
                                 <p className={styles.voteAverage}>
                                     {movie.vote_average}
                                 </p>
                                 <p className={styles.releaseDate}>
-                                    Release date: {movie.release_date}
+                                    {movie.release_date}
                                 </p>
                                 Genres:
                                 <ul className={styles.genres}>
@@ -93,6 +93,9 @@ export const MoviePage = ({ }) => {
                                         </li>
                                     })}
                                 </ul>
+                                <a className={styles.homepage} href={movie.homepage}>
+                                    {movie.homepage}
+                                </a>
                             </div>
                         </div>
                     </div>
