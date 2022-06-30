@@ -24,7 +24,7 @@
 
 *Package management:* NPM
 
-*Carousel library:* [react-responsive-carousel](https://www.npmjs.com/package/react-responsive-carousel/)
+*Carousel library:* [react-simply-carousel](https://github.com/vadymshymko/react-simply-carousel)
 
 ## Install
 
