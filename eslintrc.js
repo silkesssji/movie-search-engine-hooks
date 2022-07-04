@@ -7,8 +7,8 @@ module.exports = {
         node: true // Defines things like process.env when generating through node
     },
     extends: [
-      "react-app",
-      "react-app/jest",
+        "react-app",
+        "react-app/jest",
     ],
     parser: "babel-eslint", // Uses babel-eslint transforms.
     parserOptions: {

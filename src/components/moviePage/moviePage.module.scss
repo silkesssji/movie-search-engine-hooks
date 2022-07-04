@@ -1,3 +1,6 @@
+$skeletonBG: linear-gradient(90deg, rgba(165, 165, 165, 0.6702031154258579) 0%, rgba(230, 230, 230, 1) 50%, rgba(165, 165, 165, 1) 100%);
+
+
 .wrapper {
     display: flex;
     flex-direction: column;
@@ -14,6 +17,18 @@
     position: relative;
 }
 
+.loadPoster {
+    width: 350px;
+    height: 550px;
+    margin: 0 40px 0 0;
+    background: $skeletonBG;
+    background-size: cover;
+    background-position: center;
+    background-size: 200% 200%;
+    animation: skeletonBG 1s ease infinite;
+    border-radius: 5px;
+}
+
 .tagline {
     background-color: rgba(212, 191, 172, 0.952);
     padding: 10px;
@@ -21,6 +36,29 @@
     border-radius: 5px;
     color: rgb(132, 74, 49);
     font-style: italic;
+}
+
+.loadMoreInfo {
+    height: 200px;
+    width: 800px;
+    border-radius: 5px;
+    background: $skeletonBG;
+    background-size: cover;
+    background-position: center;
+    background-size: 200% 200%;
+    animation: skeletonBG 1s ease infinite;
+}
+
+.loadTagline {
+    width: 800px;
+    height: 30px;
+    border-radius: 5px;
+    background: $skeletonBG;
+    background-size: cover;
+    background-position: center;
+    background-size: 200% 200%;
+    animation: skeletonBG 1s ease infinite;
+    border-radius: 5px;
 }
 
 .bgWrapper {
@@ -47,6 +85,30 @@
     margin: 30px 0;
     line-height: 50px;
     text-transform: uppercase;
+}
+
+.loadTitle {
+    margin: 30px 0;
+    height: 50px;
+    width: 800px;
+    border-radius: 5px;
+    background: $skeletonBG;
+    background-size: cover;
+    background-position: center;
+    background-size: 200% 200%;
+    animation: skeletonBG 1s ease infinite;
+}
+
+.loadDescription {
+    border-radius: 5px;
+    margin: 0;
+    width: 800px;
+    height: 120px;
+    background: $skeletonBG;
+    background-size: cover;
+    background-position: center;
+    background-size: 200% 200%;
+    animation: skeletonBG 1s ease infinite;
 }
 
 .info {
@@ -113,7 +175,6 @@
     width: fit-content;
     margin: 70px auto;
     border-radius: 10px;
-    // max-width: 1200px;
 }
 
 .posterWrapper {
@@ -130,4 +191,19 @@
 
 .releaseDate {
     font-weight: bold;
+}
+
+
+@keyframes skeletonBG {
+    0% {
+        background-position: 0 0%;
+    }
+
+    50% {
+        background-position: 100% 100%;
+    }
+
+    100% {
+        background-position: 0 0%;
+    }
 }

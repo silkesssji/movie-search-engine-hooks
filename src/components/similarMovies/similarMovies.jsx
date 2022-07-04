@@ -4,9 +4,10 @@ import { Link } from "react-router-dom";
 import { useState } from 'react';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import ReactSimplyCarousel from 'react-simply-carousel';
+import React from 'react';
 
 export function SimilarMovies({
-    movies
+    movies, type
 }) {
     const [activeSlideIndex, setActiveSlideIndex] = useState(0);
     return (
@@ -61,21 +62,31 @@ export function SimilarMovies({
                     children: <span>{`<`}</span>,
                 }}
             >
-                {movies.length !== 0 && movies
-                    .map((movie, index) => {
+
+                {type === 'movies' ? (
+                    movies.map((movie) => {
                         const year = movie.release_date ? `(${movie.release_date.split('-')[0]})` : '';
                         const title = `${movie.title ? `${movie.title} ` : ''}${year}`
                         return (
                             <Link
                                 to={`/card/${movie.id}`}
-                                key={index}
+                                key={movie.id}
                                 className={styles.link}
                             >
-                                <Card imageUrl={movie.poster_path} title={title} />
+                                <Card imageUrl={movie.poster_path} title={title} id={movie.id} />
                             </Link>
                         )
-                    }
-                    )}
+                    })) : (
+                    movies.map((_, index) => {
+                        return (
+                            <div key={index} className={styles.skeletonWrapper}>
+                                <div className={styles.cardContainer}>
+                                    <div className={styles.card} />
+                                    <div className={styles.cardHeading} />
+                                </div>
+                            </div>
+                        )
+                    }))}
             </ReactSimplyCarousel>
 
         </>

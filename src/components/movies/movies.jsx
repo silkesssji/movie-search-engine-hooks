@@ -17,7 +17,7 @@ export function Movies({
                             key={index}
                             className={styles.link}
                         >
-                            <Card imageUrl={movie.poster_path} title={title} />
+                            <Card imageUrl={movie.poster_path} title={title} id={movie.id} />
                         </Link>
                     )
                 }

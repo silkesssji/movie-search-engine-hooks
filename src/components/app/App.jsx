@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useSearchParams } from "react-router-dom";
 
 
@@ -21,7 +21,7 @@ const getQueryParams = (queryParams) => {
     return { queryAdult, queryPage, queryRequestValue }
 }
 
-export function App({ }) {
+export function App() {
     const [searchParams, setSearchParams] = useSearchParams();
     const { queryAdult, queryPage, queryRequestValue } = getQueryParams(searchParams);
 
@@ -43,30 +43,29 @@ export function App({ }) {
     const [adult, setAdult] = useState(
         queryAdult === 'true' ? true : false
     );
-    const firstRender = useRef(true);
     const [genres, setGenres] = useState([]);
     const abort = useRef(null);
 
     useEffect(() => {
-        mountingInitialConditions();
+        (async () => {
+            const fetchedGenres = await fetchGenreNames();
+            setGenres(fetchedGenres);
+            setChoosedGenres(fetchedGenres);
+            setBackdropPath(await fetchRandomBackgroundUrl('day'));
+        })();
         fetchMovies();
     }, [])
 
     useEffect(() => {
-        setLoading(true);
-        updateHistoryQueryParams(page, requestValue, adult);
-        if (!firstRender.current) {
-            fetchMovies();
-        }
-        firstRender.current = false;
+        (async () => {
+            setLoading(true);
+            updateHistoryQueryParams(page, requestValue, adult);
+            await fetchMovies();
+            setLoading(false);
+        })()
     }, [page, requestValue, adult])
 
-    const mountingInitialConditions = async () => {
-        const fetchedGenres = await fetchGenreNames();
-        setGenres(fetchedGenres);
-        setChoosedGenres(fetchedGenres);
-        setBackdropPath(await fetchRandomBackgroundUrl('day'));
-    }
+
 
     const fetchRandomBackgroundUrl = async (timeType) => {
         try {
@@ -94,10 +93,10 @@ export function App({ }) {
             const json = await api.getGenres();
             const fetchedGenres = json.genres;
             const genresNames = fetchedGenres.map((genre) => genre.name);
-            errors.genresFail = null
+            setErrors({ ...errors, genresFail: null });
             return genresNames;
         } catch (e) {
-            errors.genresFail = e.message;
+            setErrors({ ...errors, genresFail: e.message })
         }
     }
 
@@ -121,14 +120,14 @@ export function App({ }) {
                 );
             setTotalPages(fetchedMovies.total_pages);
             setMovies(fetchedMovies.results);
-            errors.moviesFail = null;
+            setErrors({ ...errors, moviesFail: null })
         } catch (e) {
             if (e.message !== 'The user aborted a request.') {
-                errors.moviesFail = e.message;
+                setErrors({ ...errors, moviesFail: e.message })
+                setMovies([]);
             }
         }
         abort.current = null;
-        setLoading(false);
     }
 
     const handleRequestChange = debounce((e) => {
@@ -169,7 +168,7 @@ export function App({ }) {
         }
     }
 
-    const defineMoviesContent = () => {
+    const content = useMemo(() => {
         if (loading) {
             return <Skeleton />
         }
@@ -183,7 +182,7 @@ export function App({ }) {
                 Ничего не найдено
             </div>
         }
-    }
+    }, [movies, loading, errors]);
 
     const areAllGenresChecked = (allGenres, choosedGenres) => {
         return allGenres.every((genre) => choosedGenres.includes(genre))
@@ -198,7 +197,7 @@ export function App({ }) {
             />
             <main className={styles.main}>
                 <div className={styles.filtersWrapper}>
-                    {genres && errors.genresFail === null &&
+                    {genres && !errors.genresFail &&
                         <Filters
                             adult={adult}
                             onChange={handleCheckboxChange}
@@ -207,7 +206,7 @@ export function App({ }) {
                             allChecked={areAllGenresChecked(genres, choosedGenres)}
                         />
                     }
-                    {errors.genresFail !== null && !loading && (
+                    {errors.genresFail && !loading && (
                         <Error
                             message={'Filters error'}
                             onClick={() => window.location.reload()}
@@ -215,7 +214,7 @@ export function App({ }) {
                     )}
                 </div>
                 <div className={styles.wrapper}>
-                    {errors.moviesFail === null && (
+                    {!errors.moviesFail && (
                         <Pagination
                             totalPages={totalPages}
                             page={page}
@@ -223,16 +222,16 @@ export function App({ }) {
                         />
                     )}
 
-                    {errors.moviesFail !== null && !loading && (
+                    {errors.moviesFail && !loading && (
                         <Error
                             message={errors.moviesFail}
                             onClick={fetchMovies}
                         />
                     )}
 
-                    {defineMoviesContent()}
+                    {content}
 
-                    {errors.moviesFail === null && (
+                    {!errors.moviesFail && (
                         <Pagination
                             totalPages={totalPages}
                             page={page}
