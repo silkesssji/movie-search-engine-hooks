@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/movie-search-engine-hooks/static/css/main.455dbd1e.css",
-    "main.js": "/movie-search-engine-hooks/static/js/main.b761e1b5.js",
+    "main.css": "/movie-search-engine-hooks/static/css/main.fd63af87.css",
+    "main.js": "/movie-search-engine-hooks/static/js/main.f63786f8.js",
     "static/media/logo.svg": "/movie-search-engine-hooks/static/media/logo.6852b1ef4cd463c3a6326d990dc4e442.svg",
     "index.html": "/movie-search-engine-hooks/index.html",
     "static/media/shape.svg": "/movie-search-engine-hooks/static/media/shape.c898944bca44d54f1b36.svg",
-    "main.455dbd1e.css.map": "/movie-search-engine-hooks/static/css/main.455dbd1e.css.map",
-    "main.b761e1b5.js.map": "/movie-search-engine-hooks/static/js/main.b761e1b5.js.map"
+    "main.fd63af87.css.map": "/movie-search-engine-hooks/static/css/main.fd63af87.css.map",
+    "main.f63786f8.js.map": "/movie-search-engine-hooks/static/js/main.f63786f8.js.map"
   },
   "entrypoints": [
-    "static/css/main.455dbd1e.css",
-    "static/js/main.b761e1b5.js"
+    "static/css/main.fd63af87.css",
+    "static/js/main.f63786f8.js"
   ]
 }
