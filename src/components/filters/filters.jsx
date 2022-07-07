@@ -31,9 +31,9 @@ export function Filters({
             {existingGenres && existingGenres.map((genre, index) =>
                 <Checkbox id={`checkbox${index}`}
                     key={index}
-                    label={genre}
-                    checked={choosedGenres.includes(genre)}
-                    value={genre}
+                    label={genre.name}
+                    checked={choosedGenres.map(genre => genre.id).includes(genre.id)}
+                    value={genre.id}
                     onChange={onChange}
                 />
             )}

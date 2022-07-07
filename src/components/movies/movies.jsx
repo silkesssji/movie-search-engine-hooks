@@ -3,11 +3,12 @@ import { Card } from '../card/card';
 import { Link } from "react-router-dom";
 
 export function Movies({
-    movies
+    movies, genres
 }) {
     return (
         <>
             {movies.length !== 0 && movies
+                .filter((movie) => movie.genre_ids.every(id => genres.includes(Number(id))))
                 .map((movie, index) => {
                     const year = movie.release_date ? `(${movie.release_date.split('-')[0]})` : '';
                     const title = `${movie.title ? `${movie.title} ` : ''}${year}`

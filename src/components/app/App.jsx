@@ -21,17 +21,6 @@ const getQueryParams = (queryParams) => {
     return { queryAdult, queryPage, queryRequestValue }
 }
 
-const getQueryGenres = (genres) => {
-    const queryGenres = [];
-    genres.map((elem) => {
-        const name = queryParams.get(elem);
-        if (name) {
-            queryGenres[name] = true
-        }
-    });
-    console.log(queryGenres);
-}
-
 export function App() {
     const [searchParams, setSearchParams] = useSearchParams();
     const { queryAdult, queryPage, queryRequestValue } = getQueryParams(searchParams);
@@ -41,7 +30,7 @@ export function App() {
         queryPage ? Number(queryPage) : 1
     );
     const [backgroundPath, setBackdropPath] = useState('');
-    const [totalPages, setTotalPages] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
     const [errors, setErrors] = useState({
         moviesFail: null,
         genresFail: null
@@ -65,23 +54,48 @@ export function App() {
             await Promise.all([fetchedGenres, backdrop]);
             setBackdropPath(await backdrop);
             setGenres(await fetchedGenres);
-            setChoosedGenres(await fetchedGenres);
-            // getQueryGenres(genres);
         })();
-
         fetchMovies();
     }, [])
 
     useEffect(() => {
         (async () => {
+            if (genres.length) {
+                setQueryGenres();
+            }
+        })();
+    }, [genres])
+
+    useEffect(() => {
+        (async () => {
             setLoading(true);
-            updateHistoryQueryParams(page, requestValue, adult);
+            if (genres.length) {
+                updateHistoryQueryParams(page, requestValue, adult, choosedGenres);
+            }
             await fetchMovies();
             setLoading(false);
         })()
-    }, [page, requestValue, adult])
+    }, [page, requestValue, adult, choosedGenres])
 
+    const getQueryGenres = () => {
+        const queryGenres = searchParams.get('genresIds') ? searchParams.get('genresIds') : '';
+        if (queryGenres.length) {
+            return queryGenres.split(',');
+        } else {
+            return []
+        }
+    }
 
+    const setQueryGenres = () => {
+        const queryGenres = getQueryGenres();
+        const numberedGenres = queryGenres.map(genre => Number(genre));
+        if (queryGenres) {
+            const checkedGenres = genres.filter((genre) => numberedGenres.includes(Number(genre.id)));
+            setChoosedGenres(checkedGenres)
+        } else {
+            setChoosedGenres([...genres])
+        }
+    }
 
     const fetchRandomBackgroundUrl = async (timeType) => {
         try {
@@ -93,24 +107,25 @@ export function App() {
         }
     }
 
-    const updateHistoryQueryParams = (page, requestValue, adult) => {
+    const updateHistoryQueryParams = (page, requestValue, adult, choosedGenres) => {
+        const genresIds = choosedGenres.map((genre) => genre.id);
         const paramsObj = new URLSearchParams({
             page,
-            adult
+            adult,
+            genresIds
         });
         if (requestValue !== '') {
             paramsObj.append('request', requestValue);
         }
-        setSearchParams(paramsObj)
+        setSearchParams(paramsObj);
     }
 
     const fetchGenreNames = async () => {
         try {
             const json = await api.getGenres();
             const fetchedGenres = json.genres;
-            const genresNames = fetchedGenres.map((genre) => genre.name);
             setErrors({ ...errors, genresFail: null });
-            return genresNames;
+            return fetchedGenres;
         } catch (e) {
             setErrors({ ...errors, genresFail: e.message })
         }
@@ -136,6 +151,7 @@ export function App() {
                 );
             setTotalPages(fetchedMovies.total_pages);
             setMovies(fetchedMovies.results);
+
             setErrors({ ...errors, moviesFail: null })
         } catch (e) {
             if (e.message !== 'The user aborted a request.') {
@@ -168,10 +184,12 @@ export function App() {
         } else if (checkboxValue === "all") {
             chooseAllGenresOption();
         } else {
-            if (choosedGenres.includes(checkboxValue)) {
-                setChoosedGenres(choosedGenres.filter((genre) => genre !== checkboxValue));
+            const numberedGenre = Number(checkboxValue);
+            const numberedChoosedGenres = choosedGenres.map(genre => genre.id)
+            if (numberedChoosedGenres.includes(numberedGenre)) {
+                setChoosedGenres(choosedGenres.filter((genre) => genre.id !== numberedGenre));
             } else {
-                setChoosedGenres([...choosedGenres, checkboxValue]);
+                setChoosedGenres([...choosedGenres, ...genres.filter((genre) => genre.id === numberedGenre)]);
             }
         }
         setPage(1);
@@ -192,7 +210,7 @@ export function App() {
         }
         if (movies.length) {
             return <div className={styles.cardWrapper}>
-                <Movies movies={movies} />
+                <Movies movies={movies} genres={choosedGenres.map(genre => genre.id)} />
             </div>
         }
         if (!errors.moviesFail) {
@@ -216,10 +234,10 @@ export function App() {
             <main className={styles.main}>
                 <div className={styles.appWrapper}>
                     <div className={styles.filtersWrapper}>
-                        {loading && !errors.genresFail &&
+                        {!errors.genresFail && !genres.length &&
                             <div className={styles.loadFilters} />
                         }
-                        {genres && !errors.genresFail && !loading &&
+                        {genres.length && !errors.genresFail &&
                             <Filters
                                 adult={adult}
                                 onChange={handleCheckboxChange}
@@ -236,8 +254,8 @@ export function App() {
                         )}
                     </div>
                     <div className={styles.movieWrapper}>
-                        {loading && !errors.moviesFail && <div className={styles.loadPagination} />}
-                        {!errors.moviesFail && !loading && (
+                        {loading && !errors.moviesFail && !Boolean(totalPages) && <div className={styles.loadPagination} />}
+                        {!errors.moviesFail && Boolean(totalPages) && (
                             <Pagination
                                 totalPages={totalPages}
                                 page={page}
@@ -251,8 +269,8 @@ export function App() {
                             />
                         )}
                         {content}
-                        {loading && !errors.moviesFail && <div className={styles.loadPagination} />}
-                        {!errors.moviesFail && !loading && (
+                        {loading && !errors.moviesFail && !Boolean(totalPages) && <div className={styles.loadPagination} />}
+                        {!errors.moviesFail && Boolean(totalPages) && (
                             <Pagination
                                 totalPages={totalPages}
                                 page={page}
