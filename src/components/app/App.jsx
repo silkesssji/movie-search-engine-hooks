@@ -204,13 +204,22 @@ export function App() {
         }
     }
 
+    const filterOption = () => {
+
+    }
+
     const content = useMemo(() => {
         if (loading) {
             return <Skeleton />
         }
         if (movies.length) {
             return <div className={styles.cardWrapper}>
-                <Movies movies={movies} genres={choosedGenres.map(genre => genre.id)} />
+                <Movies
+                    movies={choosedGenres.length ? (
+                        movies.filter((movie) => movie.genre_ids.some(id => choosedGenres.map(genre => genre.id).includes(Number(id))))) : (
+                        movies
+                    )
+                    } />
             </div>
         }
         if (!errors.moviesFail) {
