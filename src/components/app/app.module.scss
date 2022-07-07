@@ -1,4 +1,7 @@
-.wrapper {
+$skeletonBG: linear-gradient(90deg, rgba(165, 165, 165, 0.6702031154258579) 0%, rgba(230, 230, 230, 1) 50%, rgba(165, 165, 165, 1) 100%);
+
+
+.movieWrapper {
     display: flex;
     flex-direction: column;
     z-index: 0;
@@ -6,6 +9,25 @@
     width: 1120px;
     align-items: center;
     margin: 0 auto;
+    margin-right: 280px;
+}
+
+.appWrapper {
+    display: flex;
+    margin: 0 auto;
+}
+
+.loadFilters {
+    width: 250px;
+    height: 430px;
+    margin: 50px auto;
+    padding: 5px;
+    background: $skeletonBG;
+    background-size: cover;
+    background-position: center;
+    background-size: 200% 200%;
+    animation: skeletonBG 1s ease infinite;
+    border-radius: 5px;
 }
 
 .cardWrapper {
@@ -13,6 +35,18 @@
     margin: -15px auto;
     flex-wrap: wrap;
     z-index: 1;
+}
+
+.loadPagination {
+    width: 350px;
+    height: 40px;
+    border-radius: 5px;
+    margin: 20px auto;
+    background: $skeletonBG;
+    background-size: cover;
+    background-position: center;
+    background-size: 200% 200%;
+    animation: skeletonBG 1s ease infinite;
 }
 
 .main {
@@ -52,8 +86,21 @@
 
 .filtersWrapper {
     z-index: 2;
-    position: absolute;
     height: 100%;
-    padding-bottom: 120px;
-    margin: 40px 50px 0;
+    // padding-bottom: 120px;
+    margin: 40px 30px 0 0;
+}
+
+@keyframes skeletonBG {
+    0% {
+        background-position: 0 0%;
+    }
+
+    50% {
+        background-position: 100% 100%;
+    }
+
+    100% {
+        background-position: 0 0%;
+    }
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useSearchParams } from "react-router-dom";
 
 
@@ -19,6 +19,17 @@ const getQueryParams = (queryParams) => {
     const queryPage = queryParams.get('page');
     const queryRequestValue = queryParams.get('request');
     return { queryAdult, queryPage, queryRequestValue }
+}
+
+const getQueryGenres = (genres) => {
+    const queryGenres = [];
+    genres.map((elem) => {
+        const name = queryParams.get(elem);
+        if (name) {
+            queryGenres[name] = true
+        }
+    });
+    console.log(queryGenres);
 }
 
 export function App() {
@@ -46,13 +57,18 @@ export function App() {
     const [genres, setGenres] = useState([]);
     const abort = useRef(null);
 
+
     useEffect(() => {
         (async () => {
-            const fetchedGenres = await fetchGenreNames();
-            setGenres(fetchedGenres);
-            setChoosedGenres(fetchedGenres);
-            setBackdropPath(await fetchRandomBackgroundUrl('day'));
+            const fetchedGenres = fetchGenreNames();
+            const backdrop = fetchRandomBackgroundUrl('day');
+            await Promise.all([fetchedGenres, backdrop]);
+            setBackdropPath(await backdrop);
+            setGenres(await fetchedGenres);
+            setChoosedGenres(await fetchedGenres);
+            // getQueryGenres(genres);
         })();
+
         fetchMovies();
     }, [])
 
@@ -80,7 +96,7 @@ export function App() {
     const updateHistoryQueryParams = (page, requestValue, adult) => {
         const paramsObj = new URLSearchParams({
             page,
-            adult,
+            adult
         });
         if (requestValue !== '') {
             paramsObj.append('request', requestValue);
@@ -130,14 +146,16 @@ export function App() {
         abort.current = null;
     }
 
-    const handleRequestChange = debounce((e) => {
-        if (e.target.value.replace(/\s/g, '')) {
-            setPage(1);
-            setRequestValue(e.target.value);
-        } else {
-            setRequestValue('');
-        }
-    }, 300)
+    const handleRequestChange = useCallback(
+        debounce((e) => {
+            if (e.target.value.replace(/\s/g, '')) {
+                setPage(1);
+                setRequestValue(e.target.value);
+            } else {
+                setRequestValue('');
+            }
+        }, 300), []
+    )
 
     const handlePageChange = (page) => {
         setPage(page);
@@ -196,48 +214,52 @@ export function App() {
                 value={requestValue}
             />
             <main className={styles.main}>
-                <div className={styles.filtersWrapper}>
-                    {genres && !errors.genresFail &&
-                        <Filters
-                            adult={adult}
-                            onChange={handleCheckboxChange}
-                            existingGenres={genres}
-                            choosedGenres={choosedGenres}
-                            allChecked={areAllGenresChecked(genres, choosedGenres)}
-                        />
-                    }
-                    {errors.genresFail && !loading && (
-                        <Error
-                            message={'Filters error'}
-                            onClick={() => window.location.reload()}
-                        />
-                    )}
-                </div>
-                <div className={styles.wrapper}>
-                    {!errors.moviesFail && (
-                        <Pagination
-                            totalPages={totalPages}
-                            page={page}
-                            changePage={handlePageChange}
-                        />
-                    )}
-
-                    {errors.moviesFail && !loading && (
-                        <Error
-                            message={errors.moviesFail}
-                            onClick={fetchMovies}
-                        />
-                    )}
-
-                    {content}
-
-                    {!errors.moviesFail && (
-                        <Pagination
-                            totalPages={totalPages}
-                            page={page}
-                            changePage={handlePageChange}
-                        />
-                    )}
+                <div className={styles.appWrapper}>
+                    <div className={styles.filtersWrapper}>
+                        {loading && !errors.genresFail &&
+                            <div className={styles.loadFilters} />
+                        }
+                        {genres && !errors.genresFail && !loading &&
+                            <Filters
+                                adult={adult}
+                                onChange={handleCheckboxChange}
+                                existingGenres={genres}
+                                choosedGenres={choosedGenres}
+                                allChecked={areAllGenresChecked(genres, choosedGenres)}
+                            />
+                        }
+                        {errors.genresFail && !loading && (
+                            <Error
+                                message={'Filters error'}
+                                onClick={() => window.location.reload()}
+                            />
+                        )}
+                    </div>
+                    <div className={styles.movieWrapper}>
+                        {loading && !errors.moviesFail && <div className={styles.loadPagination} />}
+                        {!errors.moviesFail && !loading && (
+                            <Pagination
+                                totalPages={totalPages}
+                                page={page}
+                                changePage={handlePageChange}
+                            />
+                        )}
+                        {errors.moviesFail && !loading && (
+                            <Error
+                                message={errors.moviesFail}
+                                onClick={fetchMovies}
+                            />
+                        )}
+                        {content}
+                        {loading && !errors.moviesFail && <div className={styles.loadPagination} />}
+                        {!errors.moviesFail && !loading && (
+                            <Pagination
+                                totalPages={totalPages}
+                                page={page}
+                                changePage={handlePageChange}
+                            />
+                        )}
+                    </div>
                 </div>
                 <div className={styles.bgwrapper}>
                     <div

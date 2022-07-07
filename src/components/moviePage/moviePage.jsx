@@ -17,7 +17,7 @@ export const MoviePage = ({ }) => {
     const [similarMovies, setSimilarMovies] = useState([]);
 
     useEffect(() => {
-        window.scrollTo({ top: 0, behavior: 'smooth' })
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }, [id])
 
     useEffect(() => {
@@ -25,15 +25,14 @@ export const MoviePage = ({ }) => {
         const setMovieInfo = async () => {
             const result = await api.getMovieInformation(id);
             setMovie(result);
-
         }
         setMovieInfo();
         const defineSimilarMovies = async () => {
             const result = await api.getSimilarMovies(id);
-            setSimilarMovies(result.results)
+            setSimilarMovies(result.results);
+            setLoading(false);
         }
         defineSimilarMovies();
-        setLoading(false);
     }, [id])
 
     useEffect(() => {
@@ -44,13 +43,6 @@ export const MoviePage = ({ }) => {
 
     return (
         <div className={styles.main}>
-            <div className={styles.bgWrapper}>
-                <div className={styles.background} style={{
-                    backgroundImage: poster.length
-                        ? `url(https://image.tmdb.org/t/p/w780/${poster}`
-                        : 'none'
-                }} />
-            </div>
             <Header
                 backgroundPath={poster}
                 changeRequest={() => null}
@@ -59,7 +51,7 @@ export const MoviePage = ({ }) => {
             <main className={styles.wrapper}>
                 <div className={styles.info}>
                     <div className={loading ? styles.loadPoster : styles.posterWrapper}>
-                        {!loading && Boolean(poster.length) && <img
+                        {Boolean(!loading) && Boolean(poster.length) && <img
                             key={`https://image.tmdb.org/t/p/original/${poster}`}
                             className={styles.poster}
                             src={`https://image.tmdb.org/t/p/original/${poster}`}
@@ -67,23 +59,23 @@ export const MoviePage = ({ }) => {
                     </div>
                     <div className={styles.text}>
                         <h2 className={loading ? styles.loadTitle : styles.title}>
-                            {movie.title}
+                            {Boolean(!loading) && movie.title}
                         </h2>
                         <p className={loading ? styles.loadDescription : styles.description}>
-                            {movie.overview}
+                            {Boolean(!loading) && movie.overview}
                         </p>
 
                         <p className={loading ? styles.loadTagline : styles.tagline}>
-                            {movie.tagline}
+                            {Boolean(!loading) && movie.tagline}
                         </p>
                         <div className={loading ? styles.loadMoreInfo : styles.moreInfo}>
                             <p className={styles.voteAverage}>
-                                {movie.vote_average}
+                                {Boolean(!loading) && movie.vote_average}
                             </p>
                             <p className={styles.releaseDate}>
-                                {movie.release_date}
+                                {Boolean(!loading) && movie.release_date}
                             </p>
-                            {Boolean(movie.genres) && (
+                            {Boolean(movie.genres) && Boolean(!loading) && (
                                 <ul className={styles.genres}>
                                     {movie.genres.map((genre, index) => {
                                         return <li key={index}>
@@ -92,21 +84,21 @@ export const MoviePage = ({ }) => {
                                     })}
                                 </ul>
                             )}
-                            <a
+                            {Boolean(!loading) && <a
                                 className={styles.homepage}
                                 href={movie.homepage}
                                 target="_blank" rel="noopener noreferrer"
                             >
                                 {movie.homepage}
-                            </a>
+                            </a>}
                         </div>
                     </div>
                 </div>
             </main>
             <div className={styles.similarMovies}>
                 <SimilarMovies
-                    movies={similarMovies.length ? similarMovies : skeletonArray}
-                    type={similarMovies.length ? 'movies' : 'skeleton'}
+                    movies={Boolean(similarMovies.length) ? similarMovies : skeletonArray}
+                    type={Boolean(similarMovies.length) ? 'movies' : 'skeleton'}
                 />
             </div>
             <Footer />
