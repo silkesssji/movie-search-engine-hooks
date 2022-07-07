@@ -26,6 +26,9 @@ export function App() {
     const { queryAdult, queryPage, queryRequestValue } = getQueryParams(searchParams);
 
     const [movies, setMovies] = useState([]);
+
+    const [filteredMovies, setFilteredMovies] = useState([]);
+
     const [page, setPage] = useState(
         queryPage ? Number(queryPage) : 1
     );
@@ -57,6 +60,12 @@ export function App() {
         })();
         fetchMovies();
     }, [])
+
+    useEffect(() => {
+        setFilteredMovies(choosedGenres.length ? (
+            movies.filter((movie) => movie.genre_ids.some(id => choosedGenres.map(genre => genre.id).includes(Number(id))))) : (
+            movies))
+    }, [movies])
 
     useEffect(() => {
         (async () => {
@@ -212,14 +221,10 @@ export function App() {
         if (loading) {
             return <Skeleton />
         }
-        if (movies.length) {
+        if (filteredMovies.length) {
             return <div className={styles.cardWrapper}>
                 <Movies
-                    movies={choosedGenres.length ? (
-                        movies.filter((movie) => movie.genre_ids.some(id => choosedGenres.map(genre => genre.id).includes(Number(id))))) : (
-                        movies
-                    )
-                    } />
+                    movies={filteredMovies} />
             </div>
         }
         if (!errors.moviesFail) {
@@ -227,7 +232,7 @@ export function App() {
                 Ничего не найдено
             </div>
         }
-    }, [movies, loading, errors]);
+    }, [filteredMovies, loading, errors]);
 
     const areAllGenresChecked = (allGenres, choosedGenres) => {
         return allGenres.every((genre) => choosedGenres.includes(genre))
