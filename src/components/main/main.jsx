@@ -2,7 +2,7 @@ import React from 'react';
 import { App } from '../app/app';
 import { HashRouter } from "react-router-dom";
 import { Route, Routes } from "react-router-dom";
-import { MoviePage } from '../moviePage/moviePage';
+import { MoviePage } from '../movie-page/movie-page';
 
 export const Main = ({ }) => {
     return (

@@ -1,10 +1,10 @@
-import styles from "./moviePage.module.scss";
+import styles from "./movie-page.module.scss";
 import { useParams } from "react-router-dom";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { api } from "../../lib/api";
 import { Header } from "../header/header";
 import { Footer } from "../footer/footer";
-import { SimilarMovies } from "../similarMovies/similarMovies";
+import { SimilarMovies } from "../similar-movies/similar-movies";
 import { range } from "../../lib/range";
 
 const skeletonArray = range(0, 19);
@@ -21,18 +21,13 @@ export const MoviePage = ({ }) => {
     }, [id])
 
     useEffect(() => {
-        setLoading(true);
-        const setMovieInfo = async () => {
-            const result = await api.getMovieInformation(id);
-            setMovie(result);
-        }
-        setMovieInfo();
-        const defineSimilarMovies = async () => {
-            const result = await api.getSimilarMovies(id);
-            setSimilarMovies(result.results);
+        (async () => {
+            setLoading(true);
+            const [movieInfo, fetchedSimilarMovies] = await Promise.all([api.getMovieInformation(id), api.getSimilarMovies(id)]);
+            setMovie(movieInfo);
+            setSimilarMovies(fetchedSimilarMovies.results);
             setLoading(false);
-        }
-        defineSimilarMovies();
+        })()
     }, [id])
 
     useEffect(() => {
@@ -54,6 +49,7 @@ export const MoviePage = ({ }) => {
                         {Boolean(!loading) && Boolean(poster.length) && <img
                             key={`https://image.tmdb.org/t/p/original/${poster}`}
                             className={styles.poster}
+                            alt='poster'
                             src={`https://image.tmdb.org/t/p/original/${poster}`}
                         />}
                     </div>

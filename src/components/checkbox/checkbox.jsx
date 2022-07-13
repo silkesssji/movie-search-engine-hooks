@@ -22,7 +22,7 @@ export function Checkbox({
                 onChange={onChange}
                 value={value}
             />
-            <div className={styles.content} />
+            <span className={styles.content} />
             {label}
         </label>
     )

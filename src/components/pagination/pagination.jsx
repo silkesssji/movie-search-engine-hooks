@@ -25,7 +25,7 @@ export function Pagination({
                 .map((paginator, index) => paginator.type === "page" ? (
                     <button
                         key={index}
-                        type="buton"
+                        type="button"
                         value={paginator.value}
                         className={cn(styles.button, {
                             [styles.current]: paginator.value === page

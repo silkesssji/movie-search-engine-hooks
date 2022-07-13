@@ -1,4 +1,4 @@
-import styles from './similarMovies.module.scss'
+import styles from './similar-movies.module.scss'
 import { Card } from '../card/card';
 import { Link } from "react-router-dom";
 import { useState } from 'react';

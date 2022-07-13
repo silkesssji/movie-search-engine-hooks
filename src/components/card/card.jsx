@@ -13,6 +13,7 @@ export function Card({
                     <img
                         className={styles.cardPoster}
                         src={`https://image.tmdb.org/t/p/w780/${imageUrl}`}
+                        alt='poster'
                         key={id}
                     />) : (
                     <div className={styles.posterNotFound}>No Image</div>

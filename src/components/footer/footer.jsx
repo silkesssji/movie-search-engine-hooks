@@ -9,7 +9,7 @@ export function Footer() {
                     className={styles.link}
                     href='https://www.themoviedb.org/'
                 >
-                    <img src={logo} alt="logo" width='200px' />
+                    <img src={logo} alt="logo" width='200' />
                 </a>
                 <a
                     className={styles.link}
